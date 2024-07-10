@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON CRUD</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: auto; padding: 20px; }
+        .item { margin-bottom: 10px; }
+        .item input { margin-left: 10px; }
+        .item button { margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CRUD JSON Data</h1>
+        <div>
+            <h2>Data</h2>
+            <ul id="data-list"></ul>
+        </div>
+        <div>
+            <h2>Add Data</h2>
+            <input type="text" id="new-data" placeholder="Enter new data">
+            <button onclick="addData()">Add</button>
+        </div>
+    </div>
+
+    <script>
+        const JSON_URL = 'https://raw.githubusercontent.com/TMTien08/HNT-vemaybay/master/BTL.json';
+
+        async function fetchData() {
+            const response = await fetch(JSON_URL);
+            const data = await response.json();
+            displayData(data);
+        }
+
+        function displayData(data) {
+            const dataList = document.getElementById('data-list');
+            dataList.innerHTML = '';
+            data.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'item';
+                li.innerHTML = `
+                    <span>${item}</span>
+                    <input type="text" id="edit-${index}" placeholder="Edit data" value="${item}">
+                    <button onclick="updateData(${index})">Update</button>
+                    <button onclick="deleteData(${index})">Delete</button>
+                `;
+                dataList.appendChild(li);
+            });
+        }
+
+        async function addData() {
+            const newData = document.getElementById('new-data').value;
+            if (!newData) return alert('Please enter some data');
+
+            const response = await fetch(JSON_URL);
+            const data = await response.json();
+            data.push(newData);
+            await saveData(data);
+            fetchData();
+        }
+
+        async function updateData(index) {
+            const editedData = document.getElementById(`edit-${index}`).value;
+            const response = await fetch(JSON_URL);
+            const data = await response.json();
+            data[index] = editedData;
+            await saveData(data);
+            fetchData();
+        }
+
+        async function deleteData(index) {
+            const response = await fetch(JSON_URL);
+            const data = await response.json();
+            data.splice(index, 1);
+            await saveData(data);
+            fetchData();
+        }
+
+        async function saveData(data) {
+            // Note: Directly saving to GitHub is not possible without authentication and proper API usage.
+            // This part of the code needs a backend service to handle saving data.
+            console.log('Save data:', JSON.stringify(data));
+            alert('Data saved! (This is a demo. Implement server-side logic to save changes.)');
+        }
+
+        // Fetch initial data on page load
+        fetchData();
+    </script>
+</body>
+</html>
